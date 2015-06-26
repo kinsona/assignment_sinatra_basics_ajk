@@ -31,3 +31,18 @@ post "/rock_paper_scissors" do
 
   erb :rps_result, :locals => { :result => result }
 end
+
+
+
+
+# Job scraper
+
+require './helpers/scraper_helper.rb'
+helpers ScraperHelper
+
+get "/scrape" do
+  scraper = ScraperHelper::DiceScraper.new
+  results = scraper.search
+
+  erb :scraper_result, :locals => { :results => results }
+end
