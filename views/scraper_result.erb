@@ -1,4 +1,15 @@
-<h1>Dice.com Job Scraper Results</h1>
+<h1>Dice.com Job Scraper</h1>
+
+<form action="/scrape" method="get">
+  <input type="text" name="search-text" placeholder="web developer">
+  <input type="text" name="search-location" placeholder="Boston, MA">
+  <input type="date" name="start-date" value=<%= today %>>
+  <input type="submit" value="Scrape!">
+</form>
+
+<h2><%= params[:'search-text'] %></h2>
+
+<h3>Results</h3>
 
 <table>
 
@@ -15,18 +26,21 @@
   <% results.each do |result| %>
     <tr>
 
-      <% result.each do |key, value| %>
+      <% unless result.nil? %>
+        <% result.each do |key, value| %>
 
-        <% if key == :link %>
-          <td><a href=<%= value %> >Link</a></td>
+          <% if key == :link %>
+            <td><a href=<%= value %> >Link</a></td>
 
-        <% else %>
-          <td><%= value %></td>
+          <% else %>
+            <td><%= value %></td>
+          <% end %>
+
         <% end %>
-
       <% end %>
 
     </tr>
+
   <% end %>
 
 </table>

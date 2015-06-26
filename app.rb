@@ -27,7 +27,7 @@ end
 
 
 post "/rock_paper_scissors" do
-  result = compare([ params[:player_input], ai_choice ])
+  result = compare([ params[:'player-input'], ai_choice ])
 
   erb :rps_result, :locals => { :result => result }
 end
@@ -42,7 +42,8 @@ helpers ScraperHelper
 
 get "/scrape" do
   scraper = ScraperHelper::DiceScraper.new
-  results = scraper.search
 
-  erb :scraper_result, :locals => { :results => results }
+  results = scraper.search(params)
+
+  erb :scraper_result, :locals => { :results => results, :today => Date.today }
 end

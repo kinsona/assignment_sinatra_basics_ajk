@@ -16,22 +16,28 @@ module ScraperHelper
     end
 
     # Usage: search("jobs or keywords", "Location (City, ST or ZIP)", Start Date)
-    def search(query = "Web developer", location = "Boston, MA", start_date = 0)
-      @start_date = start_date
+    def search(params)
+
+      search_text = params[:'search-text'] || "web developer"
+      search_location = params[:'search-location'] || "Boston, MA"
+      start_date = params[:'start-date'] || Date.today
+
+      start_date = Date.strptime(start_date) if start_date.is_a?(String)
 
       search_form = get_search_form
 
-      search_form.q = query
-      search_form.l = location
+      search_form.q = search_text
+      search_form.l = search_location
 
       response = @agent.submit(search_form)
 
-      job_list = scrape_jobs( sort_by_date( response ) )
+      #job_list = scrape_jobs( sort_by_date( response ) ) # see below
+      job_list = scrape_jobs( response )
 
       results = []
 
       job_list.each_entry do |job|
-        results << scrape_details(job)
+        results << scrape_details(job, start_date)
       end
 
       results
@@ -53,10 +59,13 @@ module ScraperHelper
       page.form_with(:id => 'searchJob')
     end
 
-
+=begin  Removing this and allowing Relevance to deal with old posts.
+        Sort By link currently uses JS
+        Could refactor to put sort type right into URL
     def sort_by_date(results_page)
       results_page.link_with(:id => "sort-by-date-link").click #need page=?
     end
+=end
 
 
     def scrape_jobs(results_page)
@@ -64,11 +73,11 @@ module ScraperHelper
     end
 
 
-    def scrape_details(job)
+    def scrape_details(job, start_date)
       posted_text = job.at_css("li.posted").text
 
       post_date = calc_date(posted_text)
-      return if post_date < @start_date
+      return if post_date < start_date
 
       job_title = job.at_css("h3 a").text.strip
       company = job.at_css("li.employer").text
